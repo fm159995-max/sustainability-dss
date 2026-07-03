@@ -1,122 +1,113 @@
 import streamlit as st
-import pandas as pd
+import matplotlib.pyplot as plt
 
-# إعدادات الصفحة العامة
-st.set_page_config(page_title="Sustainable Supply Chain DSS", page_icon="🌱", layout="wide")
+# 1. إعدادات الصفحة لتكون بعرض الشاشة بالكامل (Wide Mode)
+st.set_page_config(page_title="Supply Chain Sustainability DSS", page_icon="🌱", layout="wide")
 
-# استخدام الـ Session State عشان نتحكم في تنقل الصفحات
-if "page" not in st.session_state:
-    st.session_state.page = "Home"
-
-# ------------------------------------------------------
-# 🏠 شاشة الـ Home
-# ------------------------------------------------------
-if st.session_state.page == "Home":
-    st.title("🌱 Sustainable Supply Chain")
-    st.subheader("Decision Support System (Based on System Dynamics)")
-    st.markdown("---")
+# دالة محاكاة البيانات بناءً على الاستثمار والسيناريو
+def run_simulation(investment, scenario):
+    months = list(range(37)) # من 0 لـ 36 شهر
     
-    st.header("📖 About Project")
-    st.write("""
-    This application simulates the impact of sustainability investment on supplier performance 
-    and organizational success using a System Dynamics model.
-    """)
-    st.markdown("---")
-    
-    # لما يدوس هنا ينقله لصفحة الـ Setup
-    if st.button("🚀 Start Simulation", use_container_width=True):
-        st.session_state.page = "Setup"
-        st.rerun()
-
-# ------------------------------------------------------
-# ⚙️ شاشة Simulation Setup
-# ------------------------------------------------------
-elif st.session_state.page == "Setup":
-    st.title("⚙️ Simulation Setup")
-    st.subheader("تجهيز متغيرات المحاكاة والسيناريوهات")
-    st.markdown("---")
-    
-    # 🌟 ميزة السيناريوهات الجاهزة
-    st.header("🎬 Choose Scenario")
-    scenario = st.selectbox(
-        "Scenario",
-        ["Base Case", "High Investment", "High Collaboration", "Cost Reduction"]
-    )
-    
-    # تحديد القيم الافتراضية للـ Sliders بناءً على السيناريو المختار
-    if scenario == "Base Case":
-        init_invest = 12.0
-        init_collab = 50
-        init_green = 50
-        init_budget = 12.0
-    elif scenario == "High Investment":
-        init_invest = 20.0
-        init_collab = 80
-        init_green = 90
-        init_budget = 18.0
-    elif scenario == "High Collaboration":
-        init_invest = 10.0
-        init_collab = 100
-        init_green = 40
-        init_budget = 10.0
-    elif scenario == "Cost Reduction":
-        init_invest = 5.0
-        init_collab = 20
-        init_green = 10
-        init_budget = 5.0
-
-    st.markdown("---")
-    st.header("⚙️ Simulation Parameters")
-    
-    # الـ Sliders وبياخدوا قيمتهم تلقائياً من السيناريو
-    invest = st.slider("Investment in Sustainability (M)", min_value=5.0, max_value=20.0, value=init_invest, step=0.1)
-    collab = st.slider("Supplier Collaboration (0-100)", min_value=0, max_value=100, value=init_collab)
-    green = st.slider("Green Innovation Investment (0-100)", min_value=0, max_value=100, value=init_green)
-    budget = st.slider("Procurement Budget (M)", min_value=5.0, max_value=20.0, value=init_budget, step=0.1)
-    
-    st.markdown("---")
-    
-    # زرار تشغيل المحاكاة
-    if st.button("▶ Run Simulation", use_container_width=True):
-        # هنا بنعمل معادلات رياضية بسيطة (System Dynamics Logic) عشان نحسب النتايج لحظياً
-        # الـ ESG Score بيزيد بزيادة الاستثمار والابتكار الأخضر والتعاون
-        esg_score = min(100, int(50 + (invest * 1.5) + (collab * 0.2) + (green * 0.15)))
-        brand_rep = min(100, int(45 + (esg_score * 0.4) + (collab * 0.1)))
-        cust_trust = min(100, int(40 + (brand_rep * 0.5)))
-        org_success = min(100, int((esg_score + brand_rep + cust_trust) / 3 + 5))
+    # تحديد المعاملات بناءً على السيناريو المختار
+    if scenario == "Optimistic (High Impact)":
+        esg_growth = 1.8
+        brand_growth = 1.5
+        trust_growth = 1.6
+        cost_multiplier = 0.85
+    elif scenario == "Pessimistic (Low Impact)":
+        esg_growth = 0.6
+        brand_growth = 0.5
+        trust_growth = 0.4
+        cost_multiplier = 1.15
+    else: # Base Case
+        esg_growth = 1.2
+        brand_growth = 1.0
+        trust_growth = 1.1
+        cost_multiplier = 1.0
         
-        # التكاليف
-        proc_cost = round((budget * 0.5) + (invest * 0.2), 1)
-        
-        # حفظ النتائج في الـ Session عشان الـ Dashboard يشوفها
-        st.session_state.results = {
-            "esg": esg_score,
-            "brand": brand_rep,
-            "trust": cust_trust,
-            "success": org_success,
-            "invest": invest,
-            "cost": proc_cost
-        }
-        
-        # نقل المستخدم لصفحة الـ Dashboard
-        st.session_state.page = "Dashboard"
-        st.rerun()
-        
-    # زرار للرجوع للرئيسية لو حب
-    if st.button("⬅ Back to Home"):
-        st.session_state.page = "Home"
-        st.rerun()
+    # معادلات محاكاة بسيطة تشبه ديناميكيات النظام (System Dynamics)
+    esg_hist = [50 + (i * esg_growth * (investment / 50000)) for i in months]
+    brand_hist = [40 + (i * brand_growth * (investment / 50000)) for i in months]
+    trust_hist = [45 + (i * trust_growth * (investment / 50000)) for i in months]
+    
+    # حساب تكاليف الشراء Procurement Cost وتأثرها بالاستثمار والسيناريو
+    base_cost = 100000
+    cost_reduction = (investment * 0.2)
+    cost_hist = [(base_cost - cost_reduction) * (1 + (i * 0.005)) * cost_multiplier for i in months]
+    
+    # حساب النجاح المؤسسي كمحصلة للمؤشرات
+    success_hist = [(esg + br + tr) / 3 for esg, br, tr in zip(esg_hist, brand_hist, trust_hist)]
+    
+    # التأكد من عدم تخطي المؤشرات لنسبة 100%
+    esg_hist = [min(100, x) for x in esg_hist]
+    brand_hist = [min(100, x) for x in brand_hist]
+    trust_hist = [min(100, x) for x in trust_hist]
+    success_hist = [min(100, x) for x in success_hist]
+    
+    return {
+        "months": months,
+        "esg": esg_hist,
+        "brand": brand_hist,
+        "trust": trust_hist,
+        "cost": cost_hist,
+        "success": success_hist
+    }
 
-# ------------------------------------------------------
-# 📊 شاشة الـ Dashboard (هنكملها في المرحلة الرابعة)
-# ------------------------------------------------------
-elif st.session_state.page == "Dashboard":
-    st.title("📊 Dashboard & Results")
-    st.write("هنا هنعرض الـ KPI Cards والجرافات الشيك اللي اتفقنا عليها!")
-    
-    # عرض سريع للتأكد أن الحسابات شغالة
-    st.json(st.session_state.results)
-    
-    if st.button("⬅ Back to Setup"):
-        st.session_state.page = "Setup"
-        st.rerun()
+# شاشة التطبيق الرئيسية
+st.title("🌱 Supply Chain Sustainability Decision Support System")
+st.subheader("System Dynamics & Scenario Planning Model (36-Month)")
+
+st.markdown("---")
+
+# تقسيم المدخلات في الجانب الأيسر (Sidebar)
+st.sidebar.header("📊 Simulation Controls")
+investment_val = st.sidebar.slider("Green Procurement Investment ($)", 0, 100000, 50000, step=5000)
+scenario_val = st.sidebar.selectbox("Select Scenario", ["Base Case", "Optimistic (High Impact)", "Pessimistic (Low Impact)"])
+
+# تشغيل النموذج وحساب النتائج
+hist = run_simulation(investment_val, scenario_val)
+
+# عرض النتائج الحالية بشكل رقمي سريع (KPIs)
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Final Supplier ESG Score", f"{hist['esg'][-1]:.1f}%")
+col2.metric("Final Brand Reputation", f"{hist['brand'][-1]:.1f}%")
+col3.metric("Final Customer Trust", f"{hist['trust'][-1]:.1f}%")
+col4.metric("Final Procurement Cost", f"${hist['cost'][-1]:,.0f}")
+
+st.markdown("---")
+
+# 2. رسم الجرافات مصغرة ومقسمة على أعمدة (جنب بعض)
+st.header("📈 Vensim Dynamic Trends")
+
+# دالة الرسم بحجم أصغر ومناسب للأعمدة (figsize=(4, 2.2))
+def plot_vensim_graph(title, y_data, color):
+    fig, ax = plt.subplots(figsize=(4, 2.2)) # حجم ملموم جداً ومناسب للعرض
+    ax.plot(hist["months"], y_data, color=color, linewidth=2)
+    ax.set_title(title, fontsize=9, fontweight='bold')
+    ax.set_xlabel("Months", fontsize=8)
+    ax.tick_params(axis='both', labelsize=8)
+    ax.grid(True, linestyle='--', alpha=0.5)
+    return fig
+
+# السطر الأول: يحتوي على 3 جرافات جنب بعض
+row1_col1, row1_col2, row1_col3 = st.columns(3)
+
+with row1_col1:
+    st.pyplot(plot_vensim_graph("Supplier ESG Performance", hist["esg"], "green"))
+with row1_col2:
+    st.pyplot(plot_vensim_graph("Brand Reputation", hist["brand"], "blue"))
+with row1_col3:
+    st.pyplot(plot_vensim_graph("Customer Trust", hist["trust"], "purple"))
+
+st.markdown("---") # خط فاصل بين السطرين
+
+# السطر الثاني: يحتوي على الـ 3 جرافات المتبقية جنب بعض
+row2_col1, row2_col2, row2_col3 = st.columns(3)
+
+with row2_col1:
+    st.pyplot(plot_vensim_graph("Organizational Success Index", hist["success"], "orange"))
+with row2_col2:
+    # جراف ثابت لقيمة الاستثمار المدخلة
+    st.pyplot(plot_vensim_graph("Procurement Investment Level", [investment_val]*37, "gold"))
+with row2_col3:
+    st.pyplot(plot_vensim_graph("Procurement Cost Trends ($)", hist["cost"], "red"))
