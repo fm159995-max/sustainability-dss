@@ -29,7 +29,7 @@ if st.session_state.page == "Home":
 This application is an interactive Decision Support System developed from the proposed System Dynamics model. It enables users to explore different sustainability policy scenarios and visualize their impact on key supply chain performance indicators.
 """)
     st.markdown("---")
-    if st.button("🚀 Start Simulation View", use_container_width=True):
+    if st.button("▶ Run Scenario", use_container_width=True):
         st.session_state.page = "Setup"
         st.rerun()
 
@@ -37,10 +37,10 @@ This application is an interactive Decision Support System developed from the pr
 # ⚙️ شاشة Simulation Setup
 # ------------------------------------------------------
 elif st.session_state.page == "Setup":
-    st.title("⚙️ Vensim Scenario Selection")
+    st.title("⚙️ Scenario Selection")
     st.markdown("---")
     
-    st.header("🎬 Choose Simulation Scenario to Load from Vensim Model Variables")
+    st.header("🎬 Select a Policy Scenario")
     scenario = st.selectbox(
         "Scenario",
         ["Base Case", "High Consumption Rate", "High Reputation Building", "Severe Reputation Decay", "Maximized Sustainability Investment"]
@@ -90,7 +90,7 @@ elif st.session_state.page == "Setup":
     
     st.markdown("---")
     
-    if st.button("▶ Load Vensim Results", use_container_width=True):
+    if st.button("▶ Run Scenario", use_container_width=True):
         months = list(range(0, 37))
         
         # إعداد الـ Stocks الابتدائية من معادلاتكم الحقيقية
@@ -169,7 +169,7 @@ elif st.session_state.page == "Setup":
 # 📊 شاشة الـ Dashboard والجرافات المحدثة الستة (ثابتة بدون اهتزاز)
 # ------------------------------------------------------
 elif st.session_state.page == "Dashboard":
-    st.title("📊 Vensim System Dynamics Dashboard")
+    st.title("📊 System Dynamics Dashboard")
     res = st.session_state.results
     hist = res["history"]
     
