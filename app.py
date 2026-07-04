@@ -250,4 +250,4 @@ elif st.session_state.page == "Dashboard":
     elif res['scenario'] == "High Consumption Rate":
         st.warning("🟡 Policy Verdict: Accelerating capital utilization triggers rapid spending. While it drives temporary performance, it outpaces profitability replenishment, causing an eventual asset dropdown.")
     else:
-        st.info("💡 Policy Verdict: System functions under standard baseline constraints. Equilibrium is fully calibrated to Vensim steady-state values.")
+        st.info("💡 Policy Verdict: The baseline scenario represents the normal operating conditions of the proposed system. It provides a stable reference case for evaluating and comparing the effects of alternative sustainability policies.")
