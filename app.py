@@ -194,7 +194,7 @@ elif st.session_state.page == "Dashboard":
     st.markdown("<hr style='margin:2px 0px;'/>", unsafe_allow_html=True)
     
     # 2. رسم الـ 6 جرافات المطلوبة بالتحديد بأبعاد ثابتة تمنع الـ Flickering تماماً
-    st.header("📈 Dynamic Vensim Chart Matrix (Exact Requested Variables)")
+    st.header("📈 Simulation Results")
     
     def plot_vensim_graph(title, y_data, color, is_currency=False):
         # تثبيت الـ dpi والـ figsize يضمن حجم بكسل ثابت للمتصفح فلا تهتز الصور على اللاب توب
