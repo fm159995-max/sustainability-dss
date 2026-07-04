@@ -22,13 +22,12 @@ if "page" not in st.session_state:
 # ------------------------------------------------------
 if st.session_state.page == "Home":
     st.title("🌱 Supply Chain Sustainability")
-    st.subheader("Decision Support System (Strictly Based on Vensim Equations)")
+    st.subheader("Decision Support System Based on the Proposed System Dynamics Model")
     st.markdown("---")
     st.header("📖 About Project")
     st.write("""
-    This application displays the Vensim simulation results based on the mathematical interactions between 
-    Sustainability Capital Stocks, Supplier ESG Scores, Procurement Costs, and Short-Term Profitability.
-    """)
+This application is an interactive Decision Support System developed from the proposed System Dynamics model. It enables users to explore different sustainability policy scenarios and visualize their impact on key supply chain performance indicators.
+""")
     st.markdown("---")
     if st.button("🚀 Start Simulation View", use_container_width=True):
         st.session_state.page = "Setup"
