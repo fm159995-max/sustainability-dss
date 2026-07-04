@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # 1. إعدادات الصفحة لتكون بعرض الشاشة بالكامل (Wide Mode)
 st.set_page_config(page_title="Supply Chain Sustainability DSS", page_icon="🌱", layout="wide")
 
-# تقليل الهوامش العلوية للتطبيق كله عشان نكسب مساحة للشاشة الواحدة
+# تقليل الهوامش العلوية للتطبيق كله لضمان لقطة شاشة واحدة كاملة
 st.markdown("""
     <style>
     .block-container {padding-top: 1rem; padding-bottom: 0rem; padding-left: 2rem; padding-right: 2rem;}
@@ -47,6 +47,7 @@ elif st.session_state.page == "Setup":
         ["Base Case", "High Consumption Rate", "High Reputation Building", "Severe Reputation Decay", "Maximized Sustainability Investment"]
     )
     
+    # ربط الـ Sliders بمتغيرات الـ Stock and Flow الداخلية (للعرض والتوثيق فقط)
     if scenario == "Base Case":
         consumption_rate, building_rate, decay_rate, costs = 1.0, 1.0, 0.5, 50
     elif scenario == "High Consumption Rate":
@@ -68,45 +69,69 @@ elif st.session_state.page == "Setup":
     if st.button("▶ Load Vensim Results", use_container_width=True):
         months = list(range(0, 37))
         
-        if scenario == "Base Case":
-            esg = [50 + (i * 0.8) for i in months] 
-            brand = [40 + (i * 0.7) for i in months]
-            trust = [45 + (i * 0.6) for i in months]
-            success = [45 + (i * 0.7) for i in months]
-            cost = [50 + (i * 0.2) for i in months]
-            profit = [60 + (i * 0.1) for i in months]
-            
-        elif scenario == "High Consumption Rate":
-            esg = [50 + (i * 0.4) for i in months]
-            brand = [40 + (i * 0.3) for i in months]
-            trust = [45 + (i * 0.2) for i in months]
-            success = [45 + (i * 0.2) for i in months]
-            cost = [50 + (i * 0.9) for i in months]
-            profit = [60 - (i * 0.4) for i in months]
-            
-        elif scenario == "High Reputation Building":
-            esg = [50 + (i * 1.2) if 50+(i*1.2)<=100 else 100 for i in months]
-            brand = [40 + (i * 1.4) if 40+(i*1.4)<=100 else 100 for i in months]
-            trust = [45 + (i * 1.3) if 45+(i*1.3)<=100 else 100 for i in months]
-            success = [45 + (i * 1.5) if 45+(i*1.5)<=100 else 100 for i in months]
-            cost = [50 - (i * 0.3) for i in months]
-            profit = [60 + (i * 0.8) for i in months]
-            
-        elif scenario == "Severe Reputation Decay":
-            esg = [50 - (i * 0.2) for i in months]
-            brand = [40 - (i * 0.5) for i in months]
-            trust = [45 - (i * 0.4) for i in months]
-            success = [45 - (i * 0.6) for i in months]
-            cost = [50 + (i * 1.2) for i in months]
-            profit = [60 - (i * 0.8) for i in months]
+        # محاكاة ديناميكية حقيقية غير خطية شهر بشهر (Non-linear Simulation Loop)
+        sustainability_stock = 50.0
+        reputation_stock = 40.0
+        
+        esg, brand, trust, success, cost, profit = [], [], [], [], [], []
+        
+        for month in months:
+            # حساب الـ Rates اللحظية بناءً على القيمة الحالية للـ Stocks والسيناريو المختار
+            if scenario == "Base Case":
+                consumption = sustainability_stock * 0.02
+                replenishment = 1.6
+                building = (sustainability_stock * 0.03) * 0.85
+                decay = reputation_stock * 0.018
+                proc_cost = 50 + (month * 0.2)
+                
+            elif scenario == "High Consumption Rate":
+                consumption = sustainability_stock * 0.065 # استهلاك سريع للمخزون
+                replenishment = 1.0
+                building = (sustainability_stock * 0.02) * 0.5
+                decay = reputation_stock * 0.035
+                proc_cost = 50 + (month * 0.6)
+                
+            elif scenario == "High Reputation Building":
+                consumption = sustainability_stock * 0.015
+                replenishment = 2.0
+                building = (sustainability_stock * 0.045) * 1.6 # تدفق بناء قوي
+                decay = reputation_stock * 0.012
+                proc_cost = 50 - (month * 0.15)
+                
+            elif scenario == "Severe Reputation Decay":
+                consumption = sustainability_stock * 0.035
+                replenishment = 0.8
+                building = (sustainability_stock * 0.015) * 0.3
+                decay = reputation_stock * 0.075 # تدهور حاد (Outflow عالي)
+                proc_cost = 50 + (month * 0.9)
+                
+            elif scenario == "Maximized Sustainability Investment":
+                consumption = sustainability_stock * 0.02
+                replenishment = 4.8 # ضخ استثماري كثيف مستمر (Inflow عالي)
+                building = (sustainability_stock * 0.04) * 1.75
+                decay = reputation_stock * 0.005
+                proc_cost = 50 + (month * 0.35)
 
-        elif scenario == "Maximized Sustainability Investment":
-            esg = [50 + (i * 1.5) if 50+(i*1.5)<=100 else 100 for i in months]
-            brand = [40 + (i * 1.6) if 40+(i*1.6)<=100 else 100 for i in months]
-            trust = [45 + (i * 1.4) if 45+(i*1.4)<=100 else 100 for i in months]
-            success = [45 + (i * 1.6) if 45+(i*1.6)<=100 else 100 for i in months]
-            cost = [50 + (i * 0.5) for i in months]
-            profit = [60 + (i * 1.1) if 60+(i*1.1)<=100 else 100 for i in months]
+            # تحديث الـ Stocks (المعادلة التكاملية للديناميكا: المخزون = المخزون السابق + الداخل - الخارج)
+            sustainability_stock = sustainability_stock + replenishment - consumption
+            reputation_stock = reputation_stock + building - decay
+            
+            # وضع حدود منطقية للمخزون بين 0 و 100
+            sustainability_stock = max(0.0, min(100.0, sustainability_stock))
+            reputation_stock = max(0.0, min(100.0, reputation_stock))
+            
+            # حساب المتغيرات المترابطة (Auxiliary Variables)
+            customer_trust = 35.0 + (reputation_stock * 0.6)
+            org_success = 25.0 + (customer_trust * 0.45) + (sustainability_stock * 0.3)
+            current_profit = 55.0 + (org_success * 0.45) - (proc_cost * 0.25)
+            
+            # حفظ النتائج
+            esg.append(max(0, min(100, int(sustainability_stock))))
+            brand.append(max(0, min(100, int(reputation_stock))))
+            trust.append(max(0, min(100, int(customer_trust))))
+            success.append(max(0, min(100, int(org_success))))
+            cost.append(int(proc_cost))
+            profit.append(max(0, min(100, int(current_profit))))
 
         st.session_state.results = {
             "esg_val": int(esg[-1]), "brand_val": int(brand[-1]), "trust_val": int(trust[-1]),
@@ -120,7 +145,7 @@ elif st.session_state.page == "Setup":
         st.rerun()
 
 # ------------------------------------------------------
-# 📊 شاشة الـ Dashboard والجرافات (مكثفة جداً لشاشة واحدة)
+# 📊 شاشة الـ Dashboard والجرافات (مكثفة وغير خطية لشاشة واحدة)
 # ------------------------------------------------------
 elif st.session_state.page == "Dashboard":
     st.title("📊 Vensim System Dynamics Dashboard")
@@ -142,21 +167,21 @@ elif st.session_state.page == "Dashboard":
     col3.metric("📈 Org. Success", f"{res['success_val']}/100")
     col4.metric("🛡️ Customer Trust", f"{res['trust_val']}/100")
     col5.metric("💸 Proc. Costs", f"${res['cost_val']}K")
-    col6.metric("💰 Profitability", f"${res['profit_val']}K")
+    col6.metric("💰 Profitability", f"{res['profit_val']}%")
     
     st.markdown("<hr style='margin:2px 0px;'/>", unsafe_allow_html=True)
     
-    # 2. رسم الـ 6 جرافات بحجم فائق الصغر (Super Mini-graphs)
+    # 2. رسم الـ 6 جرافات بحجم فائق الصغر وانسيابية ديناميكية (Super Mini-graphs)
     st.header("📈 Dynamic Vensim Chart Matrix")
     
     def plot_vensim_graph(title, y_data, color):
-        fig, ax = plt.subplots(figsize=(2.5, 1.1)) # تصغير فائق ومكثف جداً للرسمة هيدخلهم كلهم شاشة واحدة بالملي
+        fig, ax = plt.subplots(figsize=(2.5, 1.1)) # أبعاد مصغرة جداً ومكثفة لضمان لقطة شاشة واحدة كاملة
         ax.plot(hist["months"], y_data, color=color, linewidth=1.8)
         ax.set_title(title, fontsize=7.5, fontweight='bold', pad=3)
         ax.set_xlabel("Months", fontsize=6, labelpad=1)
         ax.tick_params(axis='both', labelsize=6, pad=1)
         ax.grid(True, linestyle='--', alpha=0.3)
-        fig.tight_layout(pad=0.2) # إلغاء أي فراغات بيضاء حول الجراف
+        fig.tight_layout(pad=0.2) # إلغاء الفراغات البيضاء لتقليل السكرول
         return fig
 
     # الصف الأول
@@ -191,7 +216,7 @@ elif st.session_state.page == "Dashboard":
     
     st.markdown("<hr style='margin:2px 0px;'/>", unsafe_allow_html=True)
     
-    # 3. الـ Insights
+    # 3. الـ Insights الديناميكية للسياسات
     st.header("📋 System Dynamics Policy Insights")
     if res['scenario'] == "Maximized Sustainability Investment":
         st.success("🟢 Maximizing Sustainability Investment heavily builds the core Stock, triggering an aggressive reinforcing loop that scales up Brand Reputation, Green Innovation, and Profitability simultaneously.")
