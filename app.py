@@ -43,7 +43,7 @@ elif st.session_state.page == "Setup":
     st.header("🎬 Select a Policy Scenario")
     scenario = st.selectbox(
         "Scenario",
-        ["Base Case", "High Consumption Rate", "High Reputation Building", "Severe Reputation Decay", "Maximized Sustainability Investment"]
+        ["Base Case", "High Consumption Rate", "Severe Reputation Decay", "Maximized Sustainability Investment"]
     )
     
     # تحديد المعاملات والـ Rates بناءً على المعادلات الحقيقية والسيناريوهات
@@ -59,13 +59,6 @@ elif st.session_state.page == "Setup":
         consumption_fraction = 0.35  # زيادة معدل استهلاك الصندوق
         rep_sensitivity = 0.15
         rep_decay_fraction = 0.20
-        initial_sustainability = 5000000.0
-        
-    elif scenario == "High Reputation Building":
-        reinvest_fraction = 0.15     # زيادة نسبة إعادة الاستثمار من الأرباح
-        consumption_fraction = 0.12
-        rep_sensitivity = 0.40       # حساسية سمعة أعلى للموردين
-        rep_decay_fraction = 0.10     # تقليل تلاشي السمعة
         initial_sustainability = 5000000.0
         
     elif scenario == "Severe Reputation Decay":
@@ -215,38 +208,4 @@ elif st.session_state.page == "Dashboard":
     # الصف الأول: الـ 3 جرافات الأولى (تم إيقاف use_container_width لمنع الاهتزاز التلقائي في المتصفح)
     row1_col1, row1_col2, row1_col3 = st.columns(3)
     with row1_col1: 
-        st.pyplot(plot_vensim_graph("Investment in Sustainability (Stock)", hist["esg"], "green", is_currency=True), use_container_width=False)
-        st.caption("Cumulative capital committed to sustainability initiatives.")
-    with row1_col2: 
-        st.pyplot(plot_vensim_graph("Supplier ESG Performance", hist["supplier_esg"], "teal"), use_container_width=False)
-        st.caption("Bounded linear compliance and ESG tracking score.")
-    with row1_col3: 
-        st.pyplot(plot_vensim_graph("Short-Term Profitability", hist["profit"], "gold", is_currency=True), use_container_width=False)
-        st.caption("Net income accounting structure after procurement deductions.")
-    
-    # الصف الثاني: الـ 3 جرافات المتبقية لتمام الستة المطلوبة
-    row2_col1, row2_col2, row2_col3 = st.columns(3)
-    with row2_col1: 
-        st.pyplot(plot_vensim_graph("Procurement Costs Drain", hist["cost"], "red", is_currency=True), use_container_width=False)
-        st.caption("Fixed baseline operating cost plus variable ESG spending.")
-    with row2_col2: 
-        st.pyplot(plot_vensim_graph("Organizational Success Index", hist["success"], "orange"), use_container_width=False)
-        st.caption("Composite performance pass-through metric.")
-    with row2_col3: 
-        st.pyplot(plot_vensim_graph("Customer Trust Pipeline", hist["trust"], "purple"), use_container_width=False)
-        st.caption("Behavioral conversion function derived from reputation.")
-    
-    st.markdown("<hr style='margin:2px 0px;'/>", unsafe_allow_html=True)
-    
-    # 3. الـ Insights الديناميكية
-    st.header("📋 System Dynamics Policy Insights")
-    if res['scenario'] == "Maximized Sustainability Investment":
-        st.success("🟢 Policy Verdict: High Initial Capital coupled with high reinvestment creates a massive accumulation in Sustainability Stock, lifting the ESG score floor and creating a compounding gain in Reputation, Trust, and R&D Innovation.")
-    elif res['scenario'] == "High Reputation Building":
-        st.success("🔵 Policy Verdict: Optimizing the conversion efficiency from ESG performance to brand equity creates a high-leverage growth curve for downstream success with minimal resource drain.")
-    elif res['scenario'] == "Severe Reputation Decay":
-        st.error("🔴 Policy Verdict: High market decay triggers a balancing loophole where reputation erodes faster than it builds, heavily damaging organizational value and causing R&D budgets to drop.")
-    elif res['scenario'] == "High Consumption Rate":
-        st.warning("🟡 Policy Verdict: Accelerating capital utilization triggers rapid spending. While it drives temporary performance, it outpaces profitability replenishment, causing an eventual asset dropdown.")
-    else:
         st.info("💡 Policy Verdict: The baseline scenario represents the normal operating conditions of the proposed system. It provides a stable reference case for evaluating and comparing the effects of alternative sustainability policies.")
