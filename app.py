@@ -234,9 +234,9 @@ elif st.session_state.page == "Dashboard":
     # 3. الـ Insights الديناميكية
     st.header("📋 System Dynamics Policy Insights")
     if res['scenario'] == "Maximized Sustainability Investment":
-        st.success("🟢 Policy Verdict: High Initial Capital coupled with high reinvestment creates a massive accumulation in Sustainability Stock, lifting the ESG score floor and creating a compounding gain in Reputation, Trust, and R&D Innovation.")
+        st.success("🟢 Policy Verdict: Higher initial sustainability capital combined with increased reinvestment accelerates sustainability growth, improves supplier ESG performance, strengthens customer trust and organizational success, and ultimately enhances financial performance over time.")
     elif res['scenario'] == "Severe Reputation Decay":
-        st.error("🔴 Policy Verdict: High market decay triggers a balancing loophole where reputation erodes faster than it builds, heavily damaging organizational value and causing R&D budgets to drop.")
+        st.error("🔴 Policy Verdict: Faster reputation erosion weakens customer trust and organizational success, reducing financial performance and limiting future sustainability investment.")
     elif res['scenario'] == "High Consumption Rate":
         st.warning("🟡 Policy Verdict: Accelerating capital utilization triggers rapid spending. While it drives temporary performance, it outpaces profitability replenishment, causing an eventual asset dropdown.")
     else:
